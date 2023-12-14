@@ -1,6 +1,14 @@
 package main
-import "fmt"
+
+import (
+	"W-chat/config"
+	"W-chat/src/httpserver"
+	"fmt"
+)
 
 func main() {
-    fmt.Println("hello")
+	fmt.Println("Server Start")
+	conf := config.New()
+	httpserver.Run(HttpServerInjector(conf))
+	fmt.Println("Server End")
 }
