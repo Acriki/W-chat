@@ -13,13 +13,24 @@ import (
 	"W-chat/src/httpserver/api/handler/web"
 	"W-chat/src/httpserver/api/handler/web/v1"
 	"W-chat/src/httpserver/api/router"
+	"W-chat/src/methods"
+	"W-chat/src/repository"
+	"W-chat/src/repository/database"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
 
 func HttpServerInjector(conf *config.Config) *httpserver.Basic {
+	db := repository.NewMySQLClient(conf)
+	users := database.NewUsers(db)
+	authMethods := methods.NewAuthMethodsObj(users)
+	methodsMethods := &methods.Methods{
+		Auth: authMethods,
+	}
 	auth := &v1.Auth{
-		Config: conf,
+		Config:  conf,
+		Methods: methodsMethods,
 	}
 	webV1 := &web.V1{
 		Auth: auth,
@@ -37,3 +48,7 @@ func HttpServerInjector(conf *config.Config) *httpserver.Basic {
 	}
 	return basic
 }
+
+// wire.go:
+
+var providerSet = wire.NewSet(repository.NewMySQLClient, methods.ProviderSet)

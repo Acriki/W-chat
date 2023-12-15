@@ -3,13 +3,16 @@ package v1
 import (
 	"W-chat/config"
 	"W-chat/message/pb/web/v1"
+	jwt "W-chat/pkg"
 	mygin "W-chat/src/gin"
+	"W-chat/src/methods"
+	"strconv"
+	"time"
 )
 
 type Auth struct {
-	Config *config.Config
-	// MessageService service.IMessageService
-	// UserService    *service.UserService
+	Config  *config.Config
+	Methods *methods.Methods
 }
 
 // Login 登录接口
@@ -20,10 +23,10 @@ func (c *Auth) Login(ctx *mygin.Context) error {
 		return ctx.InvalidParams(err)
 	}
 
-	// user, err := c.UserService.Login(params.Mobile, params.Password)
-	// if err != nil {
-	// 	return ctx.ErrorBusiness(err.Error())
-	// }
+	user, err := c.Methods.Auth.Login(params.Mobile, params.Password)
+	if err != nil {
+		return ctx.ErrorBusiness(err.Error())
+	}
 
 	// TODO 这里需需要异步处理
 	// root, _ := c.RobotRepo.GetLoginRobot(ctx.Ctx())
@@ -51,8 +54,8 @@ func (c *Auth) Login(ctx *mygin.Context) error {
 
 	return ctx.Success(&web.AuthLoginResponse{
 		Type:        "Bearer",
-		AccessToken: "asdqwe",
-		ExpiresIn:   60,
+		AccessToken: c.token(user.Id),
+		ExpiresIn:   int32(c.Config.Jwt.ExpiresTime),
 	})
 }
 
@@ -129,20 +132,20 @@ func (c *Auth) Login(ctx *mygin.Context) error {
 // 	return ctx.Success(&web.AuthForgetResponse{})
 // }
 
-// func (c *Auth) token(uid int) string {
+func (c *Auth) token(uid int) string {
 
-// 	expiresAt := time.Now().Add(time.Second * time.Duration(c.Config.Jwt.ExpiresTime))
+	expiresAt := time.Now().Add(time.Second * time.Duration(c.Config.Jwt.ExpiresTime))
 
-// 	// 生成登录凭证
-// 	token := jwt.GenerateToken("api", c.Config.Jwt.Secret, &jwt.Options{
-// 		ExpiresAt: jwt.NewNumericDate(expiresAt),
-// 		ID:        strconv.Itoa(uid),
-// 		Issuer:    "im.web",
-// 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-// 	})
+	// 生成登录凭证
+	token := jwt.GenerateToken("api", c.Config.Jwt.Secret, &jwt.Options{
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		ID:        strconv.Itoa(uid),
+		Issuer:    "im.web",
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+	})
 
-// 	return token
-// }
+	return token
+}
 
 // // 设置黑名单
 // func (c *Auth) toBlackList(ctx *mygin.Context) {

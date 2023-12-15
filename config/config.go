@@ -17,6 +17,7 @@ type Config struct {
 	Server *Server `json:"server" yaml:"server"`
 	Cors   *Cors   `json:"cors" yaml:"cors"`
 	Redis  *Redis  `json:"redis" yaml:"redis"`
+	Jwt    *Jwt    `json:"jwt" yaml:"jwt"`
 }
 
 type Server struct {

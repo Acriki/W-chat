@@ -6,20 +6,21 @@ package main
 import (
 	"W-chat/config"
 	"W-chat/src/httpserver"
+	"W-chat/src/methods"
+	"W-chat/src/repository"
 
 	"github.com/google/wire"
 )
 
-// // var providerSet = wire.NewSet(
-// // 	database.ProviderSet,
-// // 	repository.NewMySQLClient,
-// // )
+var providerSet = wire.NewSet(
+	repository.NewMySQLClient,
+	methods.ProviderSet,
+)
 
 func HttpServerInjector(conf *config.Config) *httpserver.Basic {
 	panic(
 		wire.Build(
-			// database.ProviderSet,
-			// repository.NewMySQLClient,
+			providerSet,
 			httpserver.ProviderSet,
 		),
 	)

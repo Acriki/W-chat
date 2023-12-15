@@ -40,6 +40,7 @@ require (
 )
 
 require (
+	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/redis/go-redis/v9 v9.3.0
