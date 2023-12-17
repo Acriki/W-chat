@@ -1,4 +1,4 @@
-package methods
+package user
 
 import (
 	"W-chat/pkg/encrypt"
@@ -8,16 +8,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type AuthMethods struct {
+type UserAuthMethods struct {
 	user *database.Users
 }
 
-func NewAuthMethodsObj(user *database.Users) *AuthMethods {
-	return &AuthMethods{user: user}
+func NewUserAuthMethodsObj(user *database.Users) *UserAuthMethods {
+	return &UserAuthMethods{user: user}
 }
 
 // Login 登录处理
-func (a *AuthMethods) Login(mobile string, password string) (*database.UsersModel, error) {
+func (a *UserAuthMethods) Login(mobile string, password string) (*database.UsersModel, error) {
 
 	user, err := a.user.FindByMobile(mobile)
 	if err != nil {

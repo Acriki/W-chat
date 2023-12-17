@@ -1,9 +1,13 @@
 package web
 
-import v1 "W-chat/src/httpserver/api/handler/web/v1"
+import (
+	"W-chat/src/httpserver/api/handler/web/v1/talk"
+	"W-chat/src/httpserver/api/handler/web/v1/user"
+)
 
 type V1 struct {
-	Auth *v1.Auth
+	User *user.User
+	Talk *talk.Talk
 }
 
 type V2 struct {

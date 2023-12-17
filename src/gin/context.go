@@ -1,6 +1,7 @@
 package gin
 
 import (
+	"W-chat/src/gin/middleware"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -142,30 +143,30 @@ func (c *Context) Raw(value string) error {
 }
 
 // UserId 返回登录用户的UID
-// func (c *Context) UserId() int {
+func (c *Context) UserId() int {
 
-// 	if session := c.JwtSession(); session != nil {
-// 		return session.Uid
-// 	}
+	if session := c.JwtSession(); session != nil {
+		return session.Uid
+	}
 
-// 	return 0
-// }
+	return 0
+}
 
 // JwtSession 返回登录用户的JSession
-// func (c *Context) JwtSession() *middleware.JSession {
+func (c *Context) JwtSession() *middleware.JSession {
 
-// 	data, isOk := c.Context.Get(middleware.JWTSessionConst)
-// 	if !isOk {
-// 		return nil
-// 	}
+	data, isOk := c.Context.Get(middleware.JWTSessionConst)
+	if !isOk {
+		return nil
+	}
 
-// 	return data.(*middleware.JSession)
-// }
+	return data.(*middleware.JSession)
+}
 
 // IsGuest 是否是游客(未登录状态)
-// func (c *Context) IsGuest() bool {
-// 	return c.UserId() == 0
-// }
+func (c *Context) IsGuest() bool {
+	return c.UserId() == 0
+}
 
 func (c *Context) Ctx() context.Context {
 	return c.Context.Request.Context()

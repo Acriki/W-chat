@@ -14,6 +14,7 @@ import (
 
 var providerSet = wire.NewSet(
 	repository.NewMySQLClient,
+	repository.NewRedisClient,
 	methods.ProviderSet,
 )
 

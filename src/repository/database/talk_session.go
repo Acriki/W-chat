@@ -1,8 +1,13 @@
 package database
 
-import "time"
+import (
+	"context"
+	"time"
 
-type TalkSession struct {
+	"gorm.io/gorm"
+)
+
+type TalkSessionModel struct {
 	Id         int       `gorm:"column:id;primary_key;AUTO_INCREMENT" json:"id"`           // 聊天列表ID
 	TalkType   int       `gorm:"column:talk_type;default:1;NOT NULL" json:"talk_type"`     // 聊天类型[1:私信;2:群聊;]
 	UserId     int       `gorm:"column:user_id;default:0;NOT NULL" json:"user_id"`         // 用户ID
@@ -15,7 +20,7 @@ type TalkSession struct {
 	UpdatedAt  time.Time `gorm:"column:updated_at;NOT NULL" json:"updated_at"`             // 更新时间
 }
 
-func (TalkSession) TableName() string {
+func (TalkSessionModel) TableName() string {
 	return "talk_session"
 }
 
@@ -32,4 +37,27 @@ type SearchTalkSession struct {
 	GroupName   string    `json:"group_name"`
 	GroupAvatar string    `json:"group_avatar"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type TalkSession struct {
+	Repo[TalkSessionModel]
+}
+
+func NewTalkSession(db *gorm.DB) *TalkSession {
+	return &TalkSession{Repo: NewRepo[TalkSessionModel](db)}
+}
+
+func (t *TalkSession) IsDisturb(uid int, receiverId int, talkType int) bool {
+	resp, err := t.Repo.FindByWhere(context.TODO(), "user_id = ? and receiver_id = ? and talk_type = ?", uid, receiverId, talkType)
+	return err == nil && resp.IsDisturb == 1
+}
+
+func (t *TalkSession) FindBySessionId(uid int, receiverId int, talkType int) int {
+
+	resp, err := t.Repo.FindByWhere(context.TODO(), "user_id = ? and receiver_id = ? and talk_type = ?", uid, receiverId, talkType)
+	if err != nil {
+		return 0
+	}
+
+	return resp.Id
 }

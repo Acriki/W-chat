@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for file in `ls "message/proto/web/v1"`
+    do
+        protoc --proto_path=./message/3rd --proto_path=./message/proto --go_opt=paths=source_relative --go_out=./message/pb/ web/v1/$file
+    done

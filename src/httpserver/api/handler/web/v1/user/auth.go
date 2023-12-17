@@ -1,4 +1,4 @@
-package v1
+package user
 
 import (
 	"W-chat/config"
@@ -35,12 +35,12 @@ func (c *Auth) Login(ctx *mygin.Context) error {
 
 	// 	address, _ := c.IpAddressService.FindAddress(ip)
 
-	// 	_, _ = c.TalkSessionService.Create(ctx.Ctx(), &service.TalkSessionCreateOpt{
-	// 		UserId:     user.Id,
-	// 		TalkType:   entity.ChatPrivateMode,
-	// 		ReceiverId: root.UserId,
-	// 		IsBoot:     true,
-	// 	})
+	// _, _ = c.TalkSessionService.Create(ctx.Ctx(), &service.TalkSessionCreateOpt{
+	// 	UserId:     user.Id,
+	// 	TalkType:   entity.ChatPrivateMode,
+	// 	ReceiverId: root.UserId,
+	// 	IsBoot:     true,
+	// })
 
 	// 	// 推送登录消息
 	// 	_ = c.MessageService.SendLogin(ctx.Ctx(), user.Id, &message.LoginMessageRequest{

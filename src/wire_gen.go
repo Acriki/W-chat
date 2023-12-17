@@ -11,10 +11,14 @@ import (
 	"W-chat/src/httpserver"
 	"W-chat/src/httpserver/api/handler"
 	"W-chat/src/httpserver/api/handler/web"
-	"W-chat/src/httpserver/api/handler/web/v1"
+	talk2 "W-chat/src/httpserver/api/handler/web/v1/talk"
+	user2 "W-chat/src/httpserver/api/handler/web/v1/user"
 	"W-chat/src/httpserver/api/router"
 	"W-chat/src/methods"
+	"W-chat/src/methods/talk"
+	"W-chat/src/methods/user"
 	"W-chat/src/repository"
+	"W-chat/src/repository/cache"
 	"W-chat/src/repository/database"
 	"github.com/google/wire"
 )
@@ -24,24 +28,56 @@ import (
 func HttpServerInjector(conf *config.Config) *httpserver.Basic {
 	db := repository.NewMySQLClient(conf)
 	users := database.NewUsers(db)
-	authMethods := methods.NewAuthMethodsObj(users)
+	userAuthMethods := user.NewUserAuthMethodsObj(users)
+	client := repository.NewRedisClient(conf)
+	talkSession := database.NewTalkSession(db)
+	talkSessionMethods := talk.NewTalkSessionMethodsObj(client, db, talkSession)
 	methodsMethods := &methods.Methods{
-		Auth: authMethods,
+		Auth:     userAuthMethods,
+		TalkList: talkSessionMethods,
 	}
-	auth := &v1.Auth{
+	auth := &user2.Auth{
 		Config:  conf,
 		Methods: methodsMethods,
 	}
-	webV1 := &web.V1{
-		Auth: auth,
+	account := &user2.Account{
+		UsersRepo: users,
+	}
+	userUser := &user2.User{
+		Auth:    auth,
+		Account: account,
+	}
+	contactRemark := cache.NewContactRemark(client)
+	relation := cache.NewRelation(client)
+	contact := database.NewContact(db, contactRemark, relation)
+	group := database.NewGroup(db)
+	messageCache := cache.NewMessageStorage(client)
+	unreadCache := cache.NewUnreadCache(client)
+	clientCache := cache.NewClientStorage(client, conf)
+	session := &talk2.Session{
+		ContactRepo:  contact,
+		UsersRepo:    users,
+		GroupRepo:    group,
+		MessageCache: messageCache,
+		UnreadCache:  unreadCache,
+		ClientCache:  clientCache,
+		TalkSession:  talkSessionMethods,
+	}
+	talkTalk := &talk2.Talk{
+		TalkList: session,
+	}
+	v1 := &web.V1{
+		User: userUser,
+		Talk: talkTalk,
 	}
 	webHandler := &web.Handler{
-		V1: webV1,
+		V1: v1,
 	}
 	handlerHandler := &handler.Handler{
 		WebApi: webHandler,
 	}
-	engine := router.NewRouter(conf, handlerHandler)
+	jwtTokenCache := cache.NewTokenSessionCache(client)
+	engine := router.NewRouter(conf, handlerHandler, jwtTokenCache)
 	basic := &httpserver.Basic{
 		Config: conf,
 		Gin:    engine,
@@ -51,4 +87,4 @@ func HttpServerInjector(conf *config.Config) *httpserver.Basic {
 
 // wire.go:
 
-var providerSet = wire.NewSet(repository.NewMySQLClient, methods.ProviderSet)
+var providerSet = wire.NewSet(repository.NewMySQLClient, repository.NewRedisClient, methods.ProviderSet)

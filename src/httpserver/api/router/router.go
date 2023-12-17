@@ -3,6 +3,7 @@ package router
 import (
 	"W-chat/src/gin/middleware"
 	"W-chat/src/httpserver/api/handler"
+	"W-chat/src/repository/cache"
 	"net/http"
 
 	"W-chat/config"
@@ -11,7 +12,7 @@ import (
 )
 
 // NewRouter 初始化配置路由
-func NewRouter(conf *config.Config, handler *handler.Handler) *gin.Engine {
+func NewRouter(conf *config.Config, handler *handler.Handler, jwtCache *cache.JwtTokenCache) *gin.Engine {
 	router := gin.New()
 
 	// src, err := os.OpenFile(fmt.Sprintf("%s/logs/access.log", conf.Log.Path), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
@@ -33,7 +34,7 @@ func NewRouter(conf *config.Config, handler *handler.Handler) *gin.Engine {
 		c.JSON(200, map[string]any{"status": "ok"})
 	})
 
-	RegisterWebRoute(router, handler.WebApi)
+	RegisterWebRoute(router, handler.WebApi, jwtCache, conf)
 	// RegisterAdminRoute(conf.Jwt.Secret, router, handler.Admin, session)
 	// RegisterOpenRoute(router, handler.Open)
 

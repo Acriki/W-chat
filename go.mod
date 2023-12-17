@@ -8,6 +8,7 @@ require (
 	golang.org/x/crypto v0.16.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/gorm v1.25.5
+    github.com/srikrsna/protoc-gen-gotag v0.6.2
 )
 
 require (
